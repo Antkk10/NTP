@@ -184,11 +184,17 @@ public class Listado {
 
         // Construimos el mapa. Para cada departamento obtenemos el número de empleados que pertenece a ese departamento
         // con la Division que se recibe como parámetro.
-        departamentos.forEach(departamento -> {
+        /*Stream<Departamento> departamentosOrdenados=departamentos.sorted(Comparator.naturalOrder());
+
+        departamentosOrdenados.forEach(departamento -> {
             mapa.put(departamento, this.lista.values().stream().filter(empleado ->
                     empleado.getDepartamento().equals(departamento) && empleado.getDivision().equals(div)).count());
 
         });
+*/
+        mapa=lista.values().stream().filter(empleado -> empleado.getDivision() == div).
+                map(empleado->empleado.getDepartamento()).sorted(Comparator.naturalOrder()).
+                collect(Collectors.groupingBy(Function.identity(),TreeMap::new, Collectors.counting()));
 
         return mapa;
     }
@@ -227,8 +233,10 @@ public class Listado {
     public List<Empleado> buscarEmpleadosSinDepartamento(Division divisionObjetivo){
 
 
+
         return this.lista.entrySet().stream()
-                .filter(empleado -> empleado.getValue().getDepartamento().equals(Departamento.DEPNA))
+                .filter(empleado -> empleado.getValue().getDepartamento().equals(Departamento.DEPNA)
+                        && empleado.getValue().equals(divisionObjetivo))
                 .map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
